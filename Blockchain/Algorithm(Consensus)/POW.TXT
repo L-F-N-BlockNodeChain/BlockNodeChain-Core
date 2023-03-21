@@ -1,0 +1,3 @@
+the difficulty set (NONCE)
+
+the hash of the block header and nonce using a SHA-256 implementation.
