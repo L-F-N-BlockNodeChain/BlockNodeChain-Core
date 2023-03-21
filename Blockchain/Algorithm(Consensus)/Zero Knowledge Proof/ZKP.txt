@@ -10,3 +10,8 @@ The prover sends "s" to the verifier.
 The verifier checks whether:
 y1 * (s^2) = y2 * (r1^2)^b
 If the check passes, the verifier accepts the proof, and if not, the verifier rejects the proof.
+
+
+
+The function performs a computation that depends on a secret value, the public value, 
+and the block header fields, and then verifies the proof of computation without revealing the secret value.
