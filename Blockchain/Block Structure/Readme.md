@@ -1,0 +1,1 @@
+we're using the .data section to define the block structure. We define the block header as three 32-bit double words: timestamp, prev_block, and nonce. We also define the block body as a null-terminated string of data.
