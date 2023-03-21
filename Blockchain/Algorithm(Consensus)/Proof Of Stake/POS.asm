@@ -2,75 +2,57 @@ section .data
     ; Define the block header
     timestamp   dd  0           ; 32-bit timestamp
     prev_block  dd  0           ; 32-bit reference to previous block
-    stake       dd  0           ; 32-bit amount of cryptocurrency staked
-    validator   dd  0           ; 32-bit validator ID
+    validator   dd  0           ; 32-bit reference to the chosen validator
+    signature   dd  0           ; 32-bit signature of the block
     
-    ; Define the target difficulty (number of leading zeros required in hash)
-    difficulty  db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    ; Define the list of validators and their stakes
+    validators  dd  0x12345678, 0xabcdef01, 0xdeadbeef
+    stakes      dd  100, 200, 300
     
-    ; Define a buffer to hold the block header and validator ID
+    ; Define the maximum number of validators and the threshold for a valid signature
+    max_validators  equ  3
+    threshold       equ  500
+    
+    ; Define a buffer to hold the block header and validator address
     header_buf  db  16 dup(0)
-    
-    ; Define a buffer to hold the hash of the block header and validator ID
-    hash_buf    db  32 dup(0)
 
 section .text
     global pos
     
-    ; pos: Proof of Stake function that takes a block header, difficulty, validator ID, and staked amount, and returns a boolean indicating success or failure
+    ; pos: Proof of Stake function that takes a block header and returns a valid signature
     pos:
         push    ebp
         mov     ebp, esp
         
-        ; Copy the block header and validator ID into the header buffer
+        ; Copy the block header into the header buffer
         mov     esi, [ebp + 8]        ; Pointer to block header
         mov     edi, header_buf
         mov     ecx, 16
         rep     movsb
         
-        ; Compute the hash of the block header and validator ID
-        mov     edi, hash_buf
-        call    sha256
-        
-        ; Check if the hash meets the difficulty requirement
-        mov     esi, difficulty
-        xor     ecx, ecx
-        xor     edx, edx
-    check_difficulty_loop:
-        mov     cl, [esi + edx]
-        cmp     cl, 0
-        je      hash_valid           ; If difficulty is zero, hash is always valid
-        mov     cl, 8
-    leading_zero_loop:
-        test    byte [edi + ecx - 1], 0x80
-        jz      difficulty_mismatch
-        dec     cl
-        cmp     cl, [esi + edx]
-        jge     hash_valid
-        jmp     leading_zero_loop
-    difficulty_mismatch:
-        ; Hash does not meet difficulty requirement, validation failed
+        ; Choose a validator based on stake
+        xor     eax, eax
+        xor     ebx, ebx
+    choose_validator_loop:
+        cmp     ebx, max_validators
+        je      no_validators
+        mov     edx, stakes[ebx * 4]
+        cmp     edx, [ebp + 12]        ; Compare stake to threshold
+        jge     validator_chosen
+        add     eax, edx              ; Calculate total stake
+        inc     ebx
+        jmp     choose_validator_loop
+    no_validators:
+        ; No validators with sufficient stake, return 0
         xor     eax, eax
         jmp     done
-    hash_valid:
-        ; Hash meets difficulty requirement, compute the validator's probability of success
-        mov     eax, dword [header_buf + 12] ; Get validator ID from header buffer
-        add     eax, dword [ebp + 12]        ; Add staked amount to validator ID
-        xor     edx, edx
-        div     dword [esi + 8]              ; Divide by total supply to get probability
-        
-        ; Generate a random number and compare to the validator's probability of success
-        mov     ebx, eax
-        call    random
-        cmp     eax, ebx
-        jb      validation_failed
-        
-        ; Validation succeeded
-        mov     eax, 1
-        jmp     done
-    validation_failed:
-        ; Validation failed
-        xor     eax, eax
+    validator_chosen:
+        ; Validator with sufficient stake chosen, sign the block
+        mov     dword [header_buf + 12], validators[ebx * 4]
+        mov     ecx, 16
+        call    sha256                ; Compute the hash of the block header and validator address
+        mov     dword [esi + 16], eax  ; Update the block signature
+        mov     eax, dword [esi + 16]  ; Return the signature
     done:
         pop     ebp
         ret
