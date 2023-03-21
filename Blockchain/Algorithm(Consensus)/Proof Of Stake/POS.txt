@@ -1,1 +1,3 @@
 only for val
+
+the hash of the block header and validator address using a SHA-256 implementation
