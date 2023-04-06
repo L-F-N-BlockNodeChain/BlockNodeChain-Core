@@ -68,4 +68,4 @@ section .text
 
 
 
-// will switch to c++ :(
+; will switch to c++ :(

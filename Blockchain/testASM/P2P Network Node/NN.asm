@@ -100,4 +100,4 @@ section .text
         xor     eax, eax
         mov    
 
-// will switch
+; will switch
