@@ -30,22 +30,20 @@ export default function Home() {
       </div>
       <div>
         <video
-        className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        className="absolute top-0 left-0 w-full h-half object-cover z-0"
          src="/vd.mp4"
           width={100}
           height={50}
-          autoPlay
           loop
-          muted
         />
       </div>
       <div className="mb-20 grid text-bottom lg:mb-2 lg:grid-cols-4 lg:text-center">
         <a
           href="https://github.com/L-F-N-BlockNodeChain"
           className="group border border-transparent px-10 py-10 transition-colors hover:border-violet-500 hover:bg-gray-100 hover:blue:border-neutral-700 hover:dark:bg-neutral-800/30">
-          <h1 className={` text-12x1 font-bold `}>
+          <h1 className={` text-0x0 font-bold `}>
             {' '}
-          </h1>
+          Block Node Chain</h1>
         </a>
       </div>
     </main>
