@@ -1,6 +1,6 @@
 # LFNBNC
 
-Building Lighting Fast Network Block Node Chain
+Building  Block Node Chain Network
 
 
 Documentation - https://lfnbnc.gitbook.io/blockchain/
